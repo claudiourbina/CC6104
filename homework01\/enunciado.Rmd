@@ -181,12 +181,19 @@ Realice el experimento de lanzar una moneda cargada 1000 veces y observe el comp
 
 ```{r eval=TRUE}
 # Simular lanzamientos
+n = 1000
+coin <- c(1, 0) # 1: head, 0: tail
+coin.probs <- c(5/8, 3/8)
+flips <- 0
+
 for (lanzamientos in 1:1000) {
-  
+  flips[lanzamientos] <- sum(replicate(lanzamientos, sample(x=coin, size=1, prob=coin.probs)))/n
 }
 
 # Gráfico de la convergencia
+plot(1:1000, flips, type = "s", col = "red", xlab = "coin tosses", ylab = "probability of head", main="Probability of Head vs Coin Tosses")
 ```
+Claramente, se puede apreciar que la probabilidad de salir cara converge efectivamente a 5/8 = 0.625 a medida que los lanzamientos aumentan.
 
 #### El problema de Monty Hall 
 
@@ -205,18 +212,30 @@ Imagine que usted es participante del concurso y desea calcular la probabilidad 
 
 ```{r eval=FALSE}
 # Creamos una función que simule el juego
-montyhall <- function(cambiar = TRUE){
-  Puertas <- sample(1:3,3)             #Puertas donde la posición que tiene el 3 es el premio
-  posicion <- sample(1:3,1)            #Elección del participante.
-  
-  return(Eleccion) # Retornamos la elección, esta puede que tenga el premio o no
+montyhall <- function(cambiar.puerta=TRUE){
+  puertas <- sample(1:3,3) # la puerta con el valor 3 es la ganadora
+  eleccion <- sample(1:3,1) # se elige la puerta 1, 2, 3 al azar
+  abierta <- sample(setdiff(1:2,eleccion),1) # se abre una puerta no ganadora que no selecciono el participante
+  if(cambiar.puerta){
+    eleccion <<- setdiff(setdiff(1:3,eleccion), abierta) # se cambia a la que no se abrio y no tenia ya seleccionada
+  }
+  return(puertas[eleccion]==3)
 }
 
+attempts <- 0
+
 # Función que simula N juegos
-n_juegos <- function(n = 10 ,cambiar_puerta = TRUE){
-  
+play.montyhall <- function(n=10, cambiar.puerta=TRUE){
+  return(sum(replicate(n, montyhall(cambiar.puerta=cambiar.puerta))/n))
 }
+
+for(attempt in 1:1000){
+  attempts[attempt] <- play.montyhall(n=attempt)
+}
+
+plot(1:1000, attempts, type = "s", col = "red", xlab = "number of times the door was changed", ylab = "probability of win", main="Probability of win when the door is changed")
 ```
+Como se puede apreciar, la probabilidad de ganar al cambiar de puerta despues de conocer una no ganadora converge a 30% (approx). Es mejor no cambiar.
 
 ---
 
