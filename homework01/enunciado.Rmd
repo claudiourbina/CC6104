@@ -287,11 +287,19 @@ Para la segunda parte de este experimento, con las funciones ya creadas, proyect
 
 ```{r eval=FALSE}
 # Función para obtener el desarrollo de las apuestas
+
+
 ruina <- function(fondos = 100, apuesta = 5){
+  game <- c(1, -1) # 1: win, -1: lose
+  game.probs <- c(8/19, 11/19)
+  fondos.hist <- c(fondos)
+  i <- 2
   while (0<fondos & fondos<200) {
-    
+    fondos <- fondos + apuesta*sample(x=game, size=1, prob=game.probs)
+    fondos.hist[i] <- fondos
+    i <- i + 1
   }
-  return(vec_fondos) # Devuelve un vector con el desarrollo de los fondos
+  return(fondos.hist) # Devuelve un vector con el desarrollo de los fondos
 }
 
 plot(ruina(), type="l", col="blue", xlab="N° de juegos", ylab="Fondos", main="Evolución de los fondos (apuesta = 5)")
