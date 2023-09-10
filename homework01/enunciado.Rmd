@@ -186,12 +186,14 @@ coin <- c(1, 0) # 1: head, 0: tail
 coin.probs <- c(5/8, 3/8)
 flips <- 0
 
-for (lanzamientos in 1:1000) {
-  flips[lanzamientos] <- sum(replicate(lanzamientos, sample(x=coin, size=1, prob=coin.probs)))/n
+for (lanzamientos in 1:n) {
+  flips[lanzamientos] <- sum(replicate(lanzamientos, sample(x=coin, size=1, prob=coin.probs)))/lanzamientos
 }
 
 # Gráfico de la convergencia
-plot(1:1000, flips, type = "s", col = "red", xlab = "coin tosses", ylab = "probability of head", main="Probability of Head vs Coin Tosses")
+plot(1:n, flips, type = "s", col = "red", xlab = "coin tosses", ylab = "probability of head", main="Probability of Head vs Coin Tosses", ylim=(0:1))
+lines(1:n, replicate(n, (5/8)), col='blue')
+legend("topright", legend = c("Theoretical probability of head", "Empirical probability of head"), col = c("blue", "red"), lwd = 2)
 ```
 Claramente, se puede apreciar que la probabilidad de salir cara converge efectivamente a 5/8 = 0.625 a medida que los lanzamientos aumentan.
 
@@ -240,31 +242,85 @@ Como se puede apreciar, la probabilidad de ganar al cambiar de puerta despues de
 ---
 
 ## Pregunta 4: ¿Independencia?
-Ustedes disponen de los dados D1 y D2, los cuales no están cargados y son utilizados para comprobar que $\mathbb{P}(AB)=\mathbb{P}(A)\mathbb{P}(B)$ cuando el evento A es independiente del B. Para estudiar la independencia considere que los eventos A y B se definen de la siguiente manera; sea A el evento dado por los valores obtenidos en el lanzamiento del dado D1, este está compuesto por $A=\{D1=1,D1=2,D1=6\}$. Por otro lado, el evento B viene dado por los valores obtenidos con el dado D2, el que está conformado por $B=\{D2=1,D2=2,D2=3,D2=4\}$. Con esto, tendremos un $\mathbb{P}(A)=1/2$, $\mathbb{P}(𝐵)=2/3$ y $\mathbb{P}(AB)=1/3$. Compruebe de forma gráfica que al realizar 1000 lanzamientos (u otro valor grande que usted desea probar) se visualiza que $\mathbb{P}(AB)=\mathbb{P}(A)\mathbb{P}(B)$. 
-
-Hecho lo anterior, compruebe el comportamiento de un segundo grupo de eventos, dados por el lanzamiento de solo el dado D1. Donde, los eventos para D1 quedan definidos como: $A =\{D1=1,D1=2,D1=6\}$ y $B=\{D1=1,D1=2,D1=3\}$. ¿Se observa independencia en este experimento?.
-
-Se le aconseja que para simular los lanzamientos de dados utilice la función `sample()` para generar valores aleatorios entre 1 y 6. Compruebe los números generados por la función con los casos favorables de cada uno de los eventos a ser estudiados.
+Ustedes disponen de los dados D1 y D2, los cuales no están cargados y son utilizados para comprobar que $\mathbb{P}(AB)=\mathbb{P}(A)\mathbb{P}(B)$ cuando el evento A es independiente del B. Para estudiar la independencia considere que los eventos A y B se definen de la siguiente manera; sea A el evento dado por los valores obtenidos en el lanzamiento del dado D1, este está compuesto por $A=\{D1=1,D1=2,D1=6\}$. Por otro lado, el evento B viene dado por los valores obtenidos con el dado D2, el que está conformado por $B=\{D2=1,D2=2,D2=3,D2=4\}$. Con esto, tendremos un $\mathbb{P}(A)=1/2$, $\mathbb{P}(𝐵)=2/3$ y $\mathbb{P}(AB)=1/3$. Compruebe de forma gráfica que al realizar 1000 lanzamientos (u otro valor grande que usted desea probar) se visualiza que $\mathbb{P}(AB)=\mathbb{P}(A)\mathbb{P}(B)$.
 
 **Respuesta:**
 
 ```{r eval=FALSE}
 # Primer grupo de eventos
-N_lan = 1000 # Numero de lanzamientos
-  
-L_A =  # Lanzamientos favorables A = c(1, 2, 6)
-L_B =  # Lanzamientos favorables B = c(1, 2, 3, 4)
-L_AB = # Lanzamientos favorables AB = c(1, 2)
+n <- 1000 # Numero de lanzamientos
+
+A <- c(1, 2, 6)
+B <- c(1, 2, 3, 4)  
+AB <- c(1, 2)
+
+L_A <- 0  # Lanzamientos favorables A = c(1, 2, 6)
+L_B <- 0  # Lanzamientos favorables B = c(1, 2, 3, 4)
+L_AB <- 0 # Lanzamientos favorables AB = c(1, 2)
+
+for(attempt in 1:n){
+  d1 <- sample(1:6,1)
+  d2 <- sample(1:6,1)
+  if(attempt==1){
+    L_A[attempt] <- if(is.element(d1, A)) 1 else 0
+    L_B[attempt] <- if(is.element(d2, B)) 1 else 0
+    L_AB[attempt] <- if(is.element(d1, A)&is.element(d2, B)) 1 else 0
+  }else{
+    L_A[attempt] <- if(is.element(d1, A)) L_A[attempt-1] + 1 else L_A[attempt-1]
+    L_B[attempt] <- if(is.element(d2, B)) L_B[attempt-1] + 1 else L_B[attempt-1]
+    L_AB[attempt] <- if(is.element(d1, A)&is.element(d2, B)) L_AB[attempt-1] + 1 else L_AB[attempt-1]
+  }
+}
+
+L_A <- L_A/(1:n)
+L_B <- L_B/(1:n)
+L_AB <- L_AB/(1:n)
+
+plot((1:n), L_A*L_B, type = "l", col = "blue", lwd = 2, xlab = "Attempt", ylab = "Probability", main = "Demonstration of independence of variables", ylim=(0:1))
+lines((1:n), L_AB, col = "red", lwd = 2)
+legend("topright", legend = c("P(A)*P(B)", "P(AB)"), col = c("blue", "red"), lwd = 2)
+
 ```
+Se puede confirmar la independencia de las variables pues ambas convergen a 1/3.
+
+
+
+Hecho lo anterior, compruebe el comportamiento de un segundo grupo de eventos, dados por el lanzamiento de solo el dado D1. Donde, los eventos para D1 quedan definidos como: $A =\{D1=1,D1=2,D1=6\}$ y $B=\{D1=1,D1=2,D1=3\}$. ¿Se observa independencia en este experimento?.
 
 ```{r eval=FALSE}
-# Segundo grupo de eventos
-N_lan = 1000 # Numero de lanzamientos
-  
-L_A =  # Lanzamientos favorables A = c(1, 2, 6)
-L_B =  # Lanzamientos favorables B = c(1, 2, 3)
-L_AB = # Lanzamientos favorables AB = c(1, 2)
+n <- 1000 # Numero de lanzamientos
+
+A <- c(1, 2, 6)
+B <- c(1, 2, 3)
+AB <- c(1, 2)
+
+L_A <- 0  # Lanzamientos favorables A = c(1, 2, 6)
+L_B <- 0  # Lanzamientos favorables B = c(1, 2, 3)
+L_AB <- 0 # Lanzamientos favorables AB = c(1, 2)
+
+for(attempt in 1:n){
+  d1 <- sample(1:6,1)
+  if(attempt==1){
+    L_A[attempt] <- if(is.element(d1, A)) 1 else 0
+    L_B[attempt] <- if(is.element(d1, B)) 1 else 0
+    L_AB[attempt] <- if(is.element(d1, A)&is.element(d1, B)) 1 else 0
+  }else{
+    L_A[attempt] <- if(is.element(d1, A)) L_A[attempt-1] + 1 else L_A[attempt-1]
+    L_B[attempt] <- if(is.element(d1, B)) L_B[attempt-1] + 1 else L_B[attempt-1]
+    L_AB[attempt] <- if(is.element(d1, A)&is.element(d1, B)) L_AB[attempt-1] + 1 else L_AB[attempt-1]
+  }
+}
+
+L_A <- L_A/(1:n)
+L_B <- L_B/(1:n)
+L_AB <- L_AB/(1:n)
+
+plot((1:n), L_A*L_B, type = "l", col = "blue", lwd = 2, xlab = "Attempt", ylab = "Probability", main = "Demonstration of dependence of variables", ylim=(0:1))
+lines((1:n), L_AB, col = "red", lwd = 2)
+legend("topright", legend = c("P(A)*P(B)", "P(AB)"), col = c("blue", "red"), lwd = 2)
 ```
+
+En este caso las variables no son independientes pues depende del lanzamiento del mismo dado. Queda comprobado en el grafico donde no convergen al mismo valor.
 
 ---
 ## Pregunta 5: La Ruina del Jugador
@@ -279,9 +335,6 @@ Para realizar el experimento usted decide asumir las siguientes declaraciones, b
 - Usted pierde cuando se le acaban los fondos.
 
 En el primer experimento deberá obtener la evolución de los fondos hasta que el jugador se queda sin fondos para jugar. Puede ser útil seguir la lógica de una moneda cargada para realizar esto. Pruebe esto con una apuesta igual a 5, 25 y 50 graficando los resultados. Comente los resultados obtenidos.
-
-Para la segunda parte de este experimento, con las funciones ya creadas, proyecte 5000 apuestas y obtenga la probabilidad a la que converge el experimento empezando con una apuesta de: 5, 25 y 50. Para este experimento considerar como éxito (1) cuando su función ruina supera los 200 y considere lo contrario cuando su función perdida es menor o igual a 0.
-
 
 **Respuesta**
 
@@ -307,7 +360,29 @@ plot(ruina(apuesta = 25), type="l", col="blue", xlab="N° de juegos", ylab="Fond
 plot(ruina(apuesta = 50), type="l", col="blue", xlab="N° de juegos", ylab="Fondos", main="Evolución de los fondos (apuesta = 50)")
 ```
 
+Para la segunda parte de este experimento, con las funciones ya creadas, proyecte 5000 apuestas y obtenga la probabilidad a la que converge el experimento empezando con una apuesta de: 5, 25 y 50. Para este experimento considerar como éxito (1) cuando su función ruina supera los 200 y considere lo contrario cuando su función perdida es menor o igual a 0.
 
+```{r eval=FALSE}
+
+n = 5000
+attempts.5 <- 0
+attempts.25 <- 0
+attempts.50 <- 0
+
+for(attempt in 1:5000){
+  attempts.5[attempt] <- if(tail(ruina(apuesta=5), 1) >= 200) 1 else 0
+  attempts.25[attempt] <- if(tail(ruina(apuesta=25), 1) >= 200) 1 else 0
+  attempts.50[attempt] <- if(tail(ruina(apuesta=50), 1) >= 200) 1 else 0
+}
+
+prob.5 <- sum(attempts.5) / n
+prob.25 <- sum(attempts.25) / n
+prob.50 <- sum(attempts.50) / n
+
+print(paste('The probability of winning by betting 5 converges to:', prob.5))
+print(paste('The probability of winning by betting 25 converges to:', prob.25))
+print(paste('The probability of winning by betting 50 converges to:', prob.50))
+```
 
 &nbsp;
 <hr />
