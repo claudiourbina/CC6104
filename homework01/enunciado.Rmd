@@ -11,8 +11,7 @@ output:
 <center><strong>CC6104: Statistical Thinking</strong></center>
 #### **Integrantes :** 
 
-- Alumno 1
-- Alumno 2
+- Claudio Urbina
 
 #### **Cuerpo Docente:**
 
@@ -143,7 +142,7 @@ set.seed(250317)
 
 ### Gamma
 
-```{r eval=FALSE}
+```{R}
 x.range <- c(5, 15)
 for (sample in samples) {
   gamma.mean <- replicate(sample, mean(rgamma(n, 10)))
@@ -153,7 +152,7 @@ for (sample in samples) {
 
 ### Normal
 
-```{r eval=FALSE}
+```{R}
 x.range <- c(5, 15)
 for (sample in samples) {
   norm.mean <- replicate(sample, mean(rnorm(n, 10, 6)))
@@ -179,7 +178,7 @@ Realice el experimento de lanzar una moneda cargada 1000 veces y observe el comp
 
 **Respuesta**
 
-```{r eval=TRUE}
+```{R}
 # Simular lanzamientos
 n = 1000
 coin <- c(1, 0) # 1: head, 0: tail
@@ -195,6 +194,7 @@ plot(1:n, flips, type = "s", col = "red", xlab = "coin tosses", ylab = "probabil
 lines(1:n, replicate(n, (5/8)), col='blue')
 legend("topright", legend = c("Theoretical probability of head", "Empirical probability of head"), col = c("blue", "red"), lwd = 2)
 ```
+
 Claramente, se puede apreciar que la probabilidad de salir cara converge efectivamente a 5/8 = 0.625 a medida que los lanzamientos aumentan.
 
 #### El problema de Monty Hall 
@@ -212,7 +212,7 @@ Imagine que usted es participante del concurso y desea calcular la probabilidad 
 
 **Respuesta:**
 
-```{r eval=FALSE}
+```{R}
 # Creamos una función que simule el juego
 montyhall <- function(cambiar.puerta=TRUE){
   puertas <- sample(1:3,3) # la puerta con el valor 3 es la ganadora
@@ -235,8 +235,9 @@ for(attempt in 1:1000){
   attempts[attempt] <- play.montyhall(n=attempt)
 }
 
-plot(1:1000, attempts, type = "s", col = "red", xlab = "number of times the door was changed", ylab = "probability of win", main="Probability of win when the door is changed")
+plot(1:1000, attempts, type = "s", col = "red", xlab = "number of times the door was changed", ylab = "probability of win", main="Probability of win when the door is changed", ylim=(0:1))
 ```
+
 Como se puede apreciar, la probabilidad de ganar al cambiar de puerta despues de conocer una no ganadora converge a 30% (approx). Es mejor no cambiar.
 
 ---
@@ -246,7 +247,7 @@ Ustedes disponen de los dados D1 y D2, los cuales no están cargados y son utili
 
 **Respuesta:**
 
-```{r eval=FALSE}
+```{R}
 # Primer grupo de eventos
 n <- 1000 # Numero de lanzamientos
 
@@ -281,13 +282,12 @@ lines((1:n), L_AB, col = "red", lwd = 2)
 legend("topright", legend = c("P(A)*P(B)", "P(AB)"), col = c("blue", "red"), lwd = 2)
 
 ```
+
 Se puede confirmar la independencia de las variables pues ambas convergen a 1/3.
-
-
 
 Hecho lo anterior, compruebe el comportamiento de un segundo grupo de eventos, dados por el lanzamiento de solo el dado D1. Donde, los eventos para D1 quedan definidos como: $A =\{D1=1,D1=2,D1=6\}$ y $B=\{D1=1,D1=2,D1=3\}$. ¿Se observa independencia en este experimento?.
 
-```{r eval=FALSE}
+```{R}
 n <- 1000 # Numero de lanzamientos
 
 A <- c(1, 2, 6)
@@ -338,7 +338,7 @@ En el primer experimento deberá obtener la evolución de los fondos hasta que e
 
 **Respuesta**
 
-```{r eval=FALSE}
+```{R}
 # Función para obtener el desarrollo de las apuestas
 
 
@@ -362,7 +362,7 @@ plot(ruina(apuesta = 50), type="l", col="blue", xlab="N° de juegos", ylab="Fond
 
 Para la segunda parte de este experimento, con las funciones ya creadas, proyecte 5000 apuestas y obtenga la probabilidad a la que converge el experimento empezando con una apuesta de: 5, 25 y 50. Para este experimento considerar como éxito (1) cuando su función ruina supera los 200 y considere lo contrario cuando su función perdida es menor o igual a 0.
 
-```{r eval=FALSE}
+```{R}
 
 n = 5000
 attempts.5 <- 0
